@@ -471,4 +471,8 @@ requests:
           - "SR185: Undefined procedure"
           - "SQ200: No table "
           - "Virtuoso S0002 Error"
-          - "\\[(Virtuoso Driver|Virtuoso iODBC Driver)\\]\\[Virtuoso Server\\]"    
+          - "\\[(Virtuoso Driver|Virtuoso iODBC Driver)\\]\\[Virtuoso Server\\]"
+      - type: regex
+        part: body
+        regex:
+          - 'root:.*:0:0:'    
