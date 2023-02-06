@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -76,7 +77,8 @@ func snipper_query(config Config, req *http.Request) []string {
 				query_raw += fmt.Sprintf("%s=%s&", k, fmt.Sprintf("§%v§", "path"))
 			} else {
 				log.Println("Indexing object param ", k)
-				query_raw += fmt.Sprintf("%s=%s&", k, i[0])
+				t := &url.URL{Path: i[0]}
+				query_raw += fmt.Sprintf("%s=%s&", k, t.String())
 			}
 			count = count + 1
 		}
