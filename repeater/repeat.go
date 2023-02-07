@@ -46,21 +46,8 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 			new_raw.URL = uri
 
 			if req.Method == "POST" || req.Method == "PATCH" || req.Method == "PUT" {
-				if is_json(bodysave.Body.Bytes()) {
-					log.Println("Request is json detected")
-					// var body map[string]interface{}
-					// json.NewDecoder(&bodysave.Body).Decode(&body)
-					// objs := create_index_bjson(config, req, body)
-					// for l, o := range objs {
-					// 	fmt.Println(o)
-					// 	fuzzedJSON, _ := json.Marshal(o)
-					// 	content, _ := strconv.ParseInt(string(fuzzedJSON), 10, 64)
-					// 	new_raw.Body = io.NopCloser(strings.NewReader(string(fuzzedJSON)))
-					// 	new_raw.ContentLength = content
-					// 	dump, _ := httputil.DumpRequest(&new_raw, true)
-					// 	newDumpRequest := new_dump(dump)
-					// 	create_template(new_raw, newDumpRequest, config, fmt.Sprintf("body-%v", l))
-					// }
+				type_body := check_body_type(bodysave.Body.Bytes())
+				if type_body == "json" {
 					config.gen_fuzzing_body(new_raw, *req, bodysave.Body)
 				}
 			}
@@ -70,10 +57,14 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 	}
 }
 
-func is_json(s []byte) bool {
-	log.Println("Validate is request body is json")
+func check_body_type(s []byte) string {
+	log.Println("Validate is request body")
 	var js map[string]interface{}
-	return json.Unmarshal(s, &js) == nil
+	if json.Unmarshal(s, &js) == nil {
+		log.Println("Body type is json")
+		return "json"
+	}
+	return "undifined"
 }
 
 func (config Config) gen_fuzzing_query(new_raw, req *http.Request) {
