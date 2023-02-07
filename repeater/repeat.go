@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -38,37 +39,67 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 
 			//Generate fuzzing in query param
 			if len(req.URL.Query()) != 0 && req.Method == "GET" {
-				uri, _ := url.Parse(req.URL.String())
-				new_raw.URL = uri
-				array_query := create_index_query(config, req)
-				for l, query := range array_query {
-					uri.RawQuery = query
-					dump, _ := httputil.DumpRequest(&new_raw, true)
-					newDumpRequest := new_dump(dump)
-					create_template(new_raw, newDumpRequest, config, fmt.Sprintf("query-%v", l))
-				}
+				config.gen_fuzzing_query(&new_raw, req)
 			}
 
 			uri, _ := url.Parse(req.URL.String())
 			new_raw.URL = uri
-			var body map[string]interface{}
-			json.NewDecoder(&bodysave.Body).Decode(&body)
 
-			objs := create_index_bjson(config, req, body)
 			if req.Method == "POST" || req.Method == "PATCH" || req.Method == "PUT" {
-				for l, o := range objs {
-					fmt.Println(o)
-					fuzzedJSON, _ := json.Marshal(o)
-					content, _ := strconv.ParseInt(string(fuzzedJSON), 10, 64)
-					new_raw.Body = io.NopCloser(strings.NewReader(string(fuzzedJSON)))
-					new_raw.ContentLength = content
-					dump, _ := httputil.DumpRequest(&new_raw, true)
-					newDumpRequest := new_dump(dump)
-					create_template(new_raw, newDumpRequest, config, fmt.Sprintf("body-%v", l))
+				if is_json(bodysave.Body.Bytes()) {
+					log.Println("Request is json detected")
+					// var body map[string]interface{}
+					// json.NewDecoder(&bodysave.Body).Decode(&body)
+					// objs := create_index_bjson(config, req, body)
+					// for l, o := range objs {
+					// 	fmt.Println(o)
+					// 	fuzzedJSON, _ := json.Marshal(o)
+					// 	content, _ := strconv.ParseInt(string(fuzzedJSON), 10, 64)
+					// 	new_raw.Body = io.NopCloser(strings.NewReader(string(fuzzedJSON)))
+					// 	new_raw.ContentLength = content
+					// 	dump, _ := httputil.DumpRequest(&new_raw, true)
+					// 	newDumpRequest := new_dump(dump)
+					// 	create_template(new_raw, newDumpRequest, config, fmt.Sprintf("body-%v", l))
+					// }
+					config.gen_fuzzing_body(new_raw, *req, bodysave.Body)
 				}
 			}
 		}
 		req.Body = newBody
 		return req, nil
+	}
+}
+
+func is_json(s []byte) bool {
+	log.Println("Validate is request body is json")
+	var js map[string]interface{}
+	return json.Unmarshal(s, &js) == nil
+}
+
+func (config Config) gen_fuzzing_query(new_raw, req *http.Request) {
+	uri, _ := url.Parse(req.URL.String())
+	new_raw.URL = uri
+	array_query := create_index_query(config, req)
+	for l, query := range array_query {
+		uri.RawQuery = query
+		dump, _ := httputil.DumpRequest(new_raw, true)
+		newDumpRequest := new_dump(dump)
+		create_template(*new_raw, newDumpRequest, config, fmt.Sprintf("query-%v", l))
+	}
+}
+
+func (config Config) gen_fuzzing_body(new_raw, req http.Request, bodysave bytes.Buffer) {
+	var body map[string]interface{}
+	json.NewDecoder(&bodysave).Decode(&body)
+	objs := create_index_bjson(config, &req, body)
+	for l, o := range objs {
+		fmt.Println(o)
+		fuzzedJSON, _ := json.Marshal(o)
+		content, _ := strconv.ParseInt(string(fuzzedJSON), 10, 64)
+		new_raw.Body = io.NopCloser(strings.NewReader(string(fuzzedJSON)))
+		new_raw.ContentLength = content
+		dump, _ := httputil.DumpRequest(&new_raw, true)
+		newDumpRequest := new_dump(dump)
+		create_template(new_raw, newDumpRequest, config, fmt.Sprintf("body-%v", l))
 	}
 }
