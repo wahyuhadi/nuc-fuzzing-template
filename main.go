@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	template_file   = flag.String("tf", "template.txt", "Location template file ")
 	type_attack     = flag.String("t", "snipper", "Attack type")
 	proxy_ip        = flag.String("ip", "0.0.0.0", "Set Proxy IP")
 	payload         = flag.String("p", "payload/default.txt", "payload location")
@@ -29,7 +30,7 @@ func parse_config() repeater.Config {
 	}
 
 	var config repeater.Config
-	temp := template.Must(template.ParseFiles("template.txt"))
+	temp := template.Must(template.ParseFiles(*template_file))
 	config.Payload = *payload
 	config.ProxyIP = *proxy_ip
 	config.ProxyPort = *proxy_port
