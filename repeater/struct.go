@@ -21,7 +21,7 @@ type Config struct {
 	Payload       string
 	ProxyPort     string
 	Verbose       bool
-	URI           string
+	URI           []string
 	AddQueryParam string
 	Temp          *template.Template
 	TypeAttack    string

@@ -26,7 +26,7 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 		newBody := ioutil.NopCloser(&b)
 
 		//Modified Request@!
-		if req.Host == config.URI && req.Method != "OPTIONS" && req.Method != "HEAD" {
+		if Contains(config.URI, req.Host) && req.Method != "OPTIONS" && req.Method != "HEAD" {
 			var new_raw http.Request
 
 			new_raw.Method = req.Method

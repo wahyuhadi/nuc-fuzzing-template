@@ -11,8 +11,13 @@ requests:
 
     payloads:
       path: {{ .Payload }}
+    stop-at-first-match: true
     matchers-condition: or
     matchers:
+      - type: word
+        part: body
+        words:
+          - "SSTI800"
       - type: status
         part: header
         status:
@@ -21,6 +26,7 @@ requests:
       - type: regex
         regex:
           # MySQL
+          - "syntax error"
           - "SQL syntax.*?MySQL"
           - "Warning.*?\\Wmysqli?_"
           - "MySQLSyntaxErrorException"
@@ -253,6 +259,8 @@ requests:
           - "org\\.postgresql\\.jdbc"
           - "Pdo[./_\\\\]Pgsql"
           - "PSQLException"
+          - "SSTI800"
+          - "SSTI77"
 
       - type: regex
         name: microsoftsqlserver
@@ -473,6 +481,16 @@ requests:
           - "Virtuoso S0002 Error"
           - "\\[(Virtuoso Driver|Virtuoso iODBC Driver)\\]\\[Virtuoso Server\\]"
       - type: regex
+        name: lfi
         part: body
         regex:
-          - 'root:.*:0:0:'    
+          - 'root:.*:0:0:'
+      - type: regex
+        name: ssti
+        part: body
+        regex:
+          - "SSTI800"
+          - "SSTI77"
+          - "www-data"
+          - "groups"
+             

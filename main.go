@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"log"
 	"net/http"
@@ -20,22 +21,50 @@ var (
 	proxy_port      = flag.String("port", "9191", "Set Proxy Port")
 	verbose         = flag.Bool("v", false, "Log every request to stdout")
 	URI             = flag.String("url", "", "[Mandatory] Set URL to watch on proxy (Default : api.example.com)")
+	URIFILE         = flag.String("ufile", "", "Location whiteliest file")
 	add_query_param = flag.String("q", "", "Add query params example -q sort,direction,user")
 )
+
+// and returns a slice of its lines.
+func readLines(path string) ([]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, scanner.Err()
+}
 
 func parse_config() repeater.Config {
 	flag.Parse()
 	if *URI == "" {
 		os.Exit(1)
 	}
-
 	var config repeater.Config
+	list_host := []string{}
+	list_host = append(list_host, *URI)
+
+	if *URIFILE != "" {
+		list, err := readLines(*URIFILE)
+		if err != nil {
+			log.Println(err.Error())
+		}
+
+		list_host = list
+	}
+
 	temp := template.Must(template.ParseFiles(*template_file))
 	config.Payload = *payload
 	config.ProxyIP = *proxy_ip
 	config.ProxyPort = *proxy_port
 	config.Verbose = *verbose
-	config.URI = *URI
+	config.URI = list_host
 	config.AddQueryParam = *add_query_param
 	config.Temp = temp
 	config.TypeAttack = *type_attack

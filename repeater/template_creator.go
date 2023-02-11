@@ -24,6 +24,9 @@ func new_dump(dump []byte) []byte {
 
 func create_template(new_raw http.Request, newDumpRequest []byte, config Config, index string) {
 	name := strings.Replace(new_raw.URL.Path, "/", "-", -2)
+	if name == "-" {
+		name = "undifined"
+	}
 	nucleiPATH := "fuzzing-" + strings.ToLower(new_raw.Method) + name + "-" + index
 	_, err := os.Stat("template")
 	if os.IsNotExist(err) {
