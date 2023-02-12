@@ -64,6 +64,7 @@ func check_body_type(s []byte) string {
 		log.Println("Body type is json")
 		return "json"
 	}
+	log.Println("undifined body format")
 	return "undifined"
 }
 

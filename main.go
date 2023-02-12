@@ -43,7 +43,7 @@ func readLines(path string) ([]string, error) {
 
 func parse_config() repeater.Config {
 	flag.Parse()
-	if *URI == "" {
+	if *URI == "" && *URIFILE == "" {
 		os.Exit(1)
 	}
 	var config repeater.Config
@@ -56,6 +56,7 @@ func parse_config() repeater.Config {
 			log.Println(err.Error())
 		}
 
+		log.Println("add URI ", list)
 		list_host = list
 	}
 
