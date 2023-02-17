@@ -58,7 +58,7 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 }
 
 func check_body_type(s []byte) string {
-	log.Println("Validate is request body")
+	log.Println("Validating request body")
 	var js map[string]interface{}
 	if json.Unmarshal(s, &js) == nil {
 		log.Println("Body type is json")
