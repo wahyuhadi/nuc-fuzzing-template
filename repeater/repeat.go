@@ -28,7 +28,6 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 		//Modified Request@!
 		if Contains(config.URI, req.Host) && req.Method != "OPTIONS" && req.Method != "HEAD" {
 			var new_raw http.Request
-
 			new_raw.Method = req.Method
 			new_raw.Proto = req.Proto
 			new_raw.ProtoMajor = req.ProtoMajor
@@ -44,25 +43,50 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 
 			uri, _ := url.Parse(req.URL.String())
 			new_raw.URL = uri
+			log.Println(uri)
 
 			if req.Method == "POST" || req.Method == "PATCH" || req.Method == "PUT" {
-				type_body := check_body_type(bodysave.Body.Bytes())
+				type_body := check_body_type(bodysave.Body.Bytes(), req)
 				if type_body == "json" {
-					config.gen_fuzzing_body(new_raw, *req, bodysave.Body)
+					// json body
+					config.gen_fuzzing_jbody(new_raw, *req, bodysave.Body)
+				}
+
+				if type_body == "form" {
+					config.gen_fuzzing_form(&new_raw, req, bodysave.Body)
 				}
 			}
 		}
+
 		req.Body = newBody
 		return req, nil
 	}
 }
 
-func check_body_type(s []byte) string {
+func (config Config) gen_fuzzing_form(new_raw, req *http.Request, bodysave bytes.Buffer) {
+	forms := create_index_form(config, req, bodysave)
+	for l, form := range forms {
+		content, _ := strconv.ParseInt(string(form), 10, 64)
+		new_raw.ContentLength = content
+		new_raw.Body = io.NopCloser(strings.NewReader(string(form)))
+		dump, _ := httputil.DumpRequest(new_raw, true)
+		newDumpRequest := new_dump(dump)
+		create_template(*new_raw, newDumpRequest, config, fmt.Sprintf("post-form-%v", l))
+	}
+
+}
+
+func check_body_type(s []byte, req *http.Request) string {
 	log.Println("Validating request body")
 	var js map[string]interface{}
 	if json.Unmarshal(s, &js) == nil {
 		log.Println("Body type is json")
 		return "json"
+	}
+
+	if strings.Contains(req.Header.Get("Content-Type"), "form") {
+		log.Println("Body type is post form ")
+		return "form"
 	}
 	log.Println("undifined body format")
 	return "undifined"
@@ -80,12 +104,12 @@ func (config Config) gen_fuzzing_query(new_raw, req *http.Request) {
 	}
 }
 
-func (config Config) gen_fuzzing_body(new_raw, req http.Request, bodysave bytes.Buffer) {
+// json body
+func (config Config) gen_fuzzing_jbody(new_raw, req http.Request, bodysave bytes.Buffer) {
 	var body map[string]interface{}
 	json.NewDecoder(&bodysave).Decode(&body)
 	objs := create_index_bjson(config, &req, body)
 	for l, o := range objs {
-		fmt.Println(o)
 		fuzzedJSON, _ := json.Marshal(o)
 		content, _ := strconv.ParseInt(string(fuzzedJSON), 10, 64)
 		new_raw.Body = io.NopCloser(strings.NewReader(string(fuzzedJSON)))

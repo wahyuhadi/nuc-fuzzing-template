@@ -1,12 +1,52 @@
 package repeater
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
 )
+
+func create_index_form(config Config, req *http.Request, bodysave bytes.Buffer) []string {
+	var indexed []string
+	log.Println("Creating body json index for fuzzing")
+	if config.TypeAttack == "snipper" {
+		indexed = snipper_form(config, req, bodysave)
+	}
+	return indexed
+}
+
+func snipper_form(config Config, req *http.Request, bodysave bytes.Buffer) []string {
+	var array_string []string
+	form_body, _ := url.ParseQuery(bodysave.String())
+	fmt.Println(form_body)
+
+	var param []string
+	for k, _ := range form_body {
+		param = append(param, k)
+	}
+
+	for _, parv := range param {
+		count := 1
+		var query_raw string
+		for k, i := range form_body {
+			if k == parv {
+				log.Println("Indexing object param ", k)
+				query_raw += fmt.Sprintf("%s=%s&", k, fmt.Sprintf("§%v§", "path"))
+			} else {
+				log.Println("Indexing object param ", k)
+				t := &url.URL{Path: i[0]}
+				query_raw += fmt.Sprintf("%s=%s&", k, t.String())
+			}
+			count = count + 1
+		}
+		array_string = append(array_string, query_raw)
+	}
+
+	return array_string
+}
 
 func create_index_bjson(config Config, req *http.Request, body map[string]interface{}) []map[string]interface{} {
 
