@@ -26,6 +26,7 @@ requests:
       - type: regex
         regex:
           # MySQL
+          - "Database Error"
           - "syntax error"
           - "SQL syntax.*?MySQL"
           - "Warning.*?\\Wmysqli?_"

