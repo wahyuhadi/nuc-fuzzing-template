@@ -35,9 +35,13 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 			new_raw.Host = "{{ Hostname }}"
 			new_raw.Header = req.Header
 			new_raw.URL = req.URL
+			lenQuery := len(req.URL.Query())
 
+			if config.AddQueryParam != "" {
+				lenQuery = len(config.AddQueryParam)
+			}
 			//Generate fuzzing in query param
-			if len(req.URL.Query()) != 0 && req.Method == "GET" {
+			if lenQuery != 0 && req.Method == "GET" {
 				config.gen_fuzzing_query(&new_raw, req)
 			}
 
