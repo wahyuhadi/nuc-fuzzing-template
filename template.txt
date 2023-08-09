@@ -2,7 +2,7 @@ id: {{.Name}}
 info:
   name: {{ .TempName }}
   author: Rahmat Wahyu Hadi
-  severity: info
+  severity: high
 
 requests:
   - raw:
@@ -17,7 +17,8 @@ requests:
       - type: word
         part: body
         words:
-          - "SSTI800"
+          - "44435556"
+          - "6666*6666"
       - type: status
         part: header
         status:
@@ -494,4 +495,10 @@ requests:
           - "SSTI77"
           - "www-data"
           - "groups"
+      - type: word
+        part: body
+        name: ssti
+        words:
+          - "44435556"
+          - "6666*6666"
              
