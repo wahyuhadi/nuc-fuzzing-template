@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -23,7 +22,7 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 
 		var bodysave BodySave
 		bodysave.Body = b
-		newBody := ioutil.NopCloser(&b)
+		newBody := io.NopCloser(&b)
 
 		//Modified Request@!
 		if Contains(config.URI, req.Host) && req.Method != "OPTIONS" && req.Method != "HEAD" {

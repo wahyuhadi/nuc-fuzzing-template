@@ -14,11 +14,6 @@ requests:
     stop-at-first-match: true
     matchers-condition: or
     matchers:
-      - type: word
-        part: body
-        words:
-          - "44435556"
-          - "6666*6666"
       - type: status
         part: header
         status:
@@ -27,6 +22,7 @@ requests:
       - type: regex
         regex:
           # MySQL
+          - "You have an error in your SQL syntax"
           - "Database Error"
           - "syntax error"
           - "SQL syntax.*?MySQL"
@@ -495,10 +491,5 @@ requests:
           - "SSTI77"
           - "www-data"
           - "groups"
-      - type: word
-        part: body
-        name: ssti
-        words:
-          - "44435556"
-          - "6666*6666"
+
              

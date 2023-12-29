@@ -24,6 +24,7 @@ func new_dump(dump []byte) []byte {
 
 func create_template(new_raw http.Request, newDumpRequest []byte, config Config, index string) {
 	name := strings.Replace(new_raw.URL.Path, "/", "-", -2)
+	name = strings.Replace(name, ".", "-", 5)
 	if name == "-" {
 		name = "undifined"
 	}
