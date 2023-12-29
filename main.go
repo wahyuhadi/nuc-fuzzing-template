@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"text/template"
 
 	"github.com/wahyuhadi/nuc-fuzzing-template/repeater"
 	"gopkg.in/elazarl/goproxy.v1"
@@ -60,14 +59,14 @@ func parse_config() repeater.Config {
 		list_host = list
 	}
 
-	temp := template.Must(template.ParseFiles(*template_file))
+	// temp := template.Must(template.ParseFiles(*template_file))
 	config.Payload = *payload
 	config.ProxyIP = *proxy_ip
 	config.ProxyPort = *proxy_port
 	config.Verbose = *verbose
 	config.URI = list_host
 	config.AddQueryParam = *add_query_param
-	config.Temp = temp
+	// config.Temp = temp
 	config.TypeAttack = *type_attack
 
 	return config

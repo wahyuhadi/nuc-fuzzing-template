@@ -1,30 +1,41 @@
 id: {{.Name}}
-info:
-  name: {{ .TempName }}
-  author: Rahmat Wahyu Hadi
-  severity: high
 
+info:
+  name: Error based SQL Injection
+  author: geeknik,pdteam
+  severity: critical
+  description: |
+    Direct SQL Command Injection is a technique where an attacker creates or alters existing SQL commands to expose hidden data,
+    or to override valuable ones, or even to execute dangerous system level commands on the database host.
+    This is accomplished by the application taking user input and combining it with static parameters to build an SQL query .
+  tags: sqli,error,dast
+
+self-contained: true
 requests:
   - raw:
       - |
         {{ .Raw }}
 
     payloads:
-      path: {{ .Payload }}
+      path:
+        - "test'"
+        - "\""
+        - "(case when(1=1)+then+1+end);"
+        - "`1`````"
+        
     stop-at-first-match: true
-    matchers-condition: or
+    matchers-condition: and
     matchers:
-      - type: status
-        part: header
-        status:
-          - 500
-          - 503
+      - type: word
+        part: body
+        words:
+          - "Adminer"
+        negative: true
+        # False Positive
+
       - type: regex
         regex:
           # MySQL
-          - "You have an error in your SQL syntax"
-          - "Database Error"
-          - "syntax error"
           - "SQL syntax.*?MySQL"
           - "Warning.*?\\Wmysqli?_"
           - "MySQLSyntaxErrorException"
@@ -33,7 +44,6 @@ requests:
           - "Unknown column '[^ ]+' in 'field list'"
           - "MySqlClient\\."
           - "com\\.mysql\\.jdbc"
-          - "SQLITE_ERROR"
           - "Zend_Db_(Adapter|Statement)_Mysqli_Exception"
           - "Pdo[./_\\\\]Mysql"
           - "MySqlException"
@@ -123,6 +133,7 @@ requests:
           - "Pdo[./_\\\\]Firebird"
           # SQLite
           - "SQLite/JDBCDriver"
+          - "SQLITE_ERROR:"
           - "SQLite\\.Exception"
           - "(Microsoft|System)\\.Data\\.SQLite\\.SQLiteException"
           - "Warning.*?\\W(sqlite_|SQLite3::)"
@@ -257,8 +268,6 @@ requests:
           - "org\\.postgresql\\.jdbc"
           - "Pdo[./_\\\\]Pgsql"
           - "PSQLException"
-          - "SSTI800"
-          - "SSTI77"
 
       - type: regex
         name: microsoftsqlserver
@@ -478,18 +487,3 @@ requests:
           - "SQ200: No table "
           - "Virtuoso S0002 Error"
           - "\\[(Virtuoso Driver|Virtuoso iODBC Driver)\\]\\[Virtuoso Server\\]"
-      - type: regex
-        name: lfi
-        part: body
-        regex:
-          - 'root:.*:0:0:'
-      - type: regex
-        name: ssti
-        part: body
-        regex:
-          - "SSTI800"
-          - "SSTI77"
-          - "www-data"
-          - "groups"
-
-             
