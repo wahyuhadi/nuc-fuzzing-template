@@ -3,7 +3,7 @@ id: {{.Name}}
 info:
   name: Blind OS Command Injection
   author: pdteam,geeknik
-  severity: high
+  severity: critical
   description: |
       Potential blind OS command injection vulnerabilities, where the application constructs OS commands using unsanitized user input.
       Successful exploitation could lead to arbitrary command execution on the system.
@@ -22,9 +22,8 @@ requests:
 
     payloads:
       path:
+        - "|id"
         - ";id"
-        - "127.0.0.1;id"
-        - ";cat /etc/passwd"
 
     
 

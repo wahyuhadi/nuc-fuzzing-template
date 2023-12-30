@@ -25,4 +25,5 @@ type Config struct {
 	AddQueryParam string
 	Temp          *template.Template
 	TypeAttack    string
+	Templates     string
 }

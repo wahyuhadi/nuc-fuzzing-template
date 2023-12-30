@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"text/template"
 
 	"github.com/google/uuid"
@@ -28,24 +29,34 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 	if new_raw.URL.Path == "/socket.io/" {
 		return nil
 	}
+
+	var templates []string
 	var temp *template.Template
 	// temp := template.Must(template.ParseFiles("sqli"))
 	files, err := os.ReadDir("builder")
+
 	if err != nil {
 		log.Println("Error when read bulder directory")
 		return nil
 	}
 	for _, file := range files {
-		temp = template.Must(template.ParseFiles(fmt.Sprintf("builder/%s", file.Name())))
+		templates = append(templates, file.Name())
+
+	}
+
+	if config.Templates != "" {
+		templates = strings.Split(config.Templates, ",")
+	}
+
+	for _, file := range templates {
+		if !is_exist_temp(file) {
+			log.Println("Your template not exist in builder folder : your input is  ", file)
+			continue
+		}
+		temp = template.Must(template.ParseFiles(fmt.Sprintf("builder/%s", file)))
 		config.Temp = temp
-		// name := strings.Replace(new_raw.URL.Path, "/", "-", -2)
-		// name = strings.Replace(name, ".", "-", 5)
-		// if name == "-" {
-		// 	name = "undifined"
-		// }
-		// nucleiPATH := "fuzzing-" + strings.ToLower(new_raw.Method) + name + "-" + index
-		log.Println("Creating template white builder", file.Name())
-		nucleiPATH := fmt.Sprintf("%s-fuzzing-%v", file.Name(), uuid.New())
+
+		nucleiPATH := fmt.Sprintf("%s-fuzzing-%v", file, uuid.New())
 		_, err := os.Stat("template")
 		if os.IsNotExist(err) {
 			errDir := os.MkdirAll("template", 0755)
@@ -66,4 +77,21 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 		log.Println("Creating template in ", nucleiPATH)
 	}
 	return nil
+}
+
+func is_exist_temp(t string) bool {
+	files, err := os.ReadDir("builder")
+
+	if err != nil {
+		log.Println("Error when read bulder directory")
+		return false
+	}
+
+	for _, file := range files {
+		if t == file.Name() {
+			return true
+		}
+
+	}
+	return false
 }
