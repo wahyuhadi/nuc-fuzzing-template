@@ -17,6 +17,7 @@ requests:
 
     payloads:
       path:
+        - 'file:///etc/passwd'
         - '/etc/passwd'
         - '../../etc/passwd'
         - '../../../etc/passwd'
