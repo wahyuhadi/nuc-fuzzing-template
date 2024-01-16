@@ -2,14 +2,13 @@ package repeater
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"text/template"
-
-	"github.com/google/uuid"
 )
 
 func new_dump(dump []byte) []byte {
@@ -26,7 +25,7 @@ func new_dump(dump []byte) []byte {
 }
 
 func create_template(new_raw http.Request, newDumpRequest []byte, config Config, index string) error {
-	if new_raw.URL.Path == "/socket.io/" {
+	if new_raw.URL.Path == "/socket.io/" || strings.Contains(new_raw.URL.Path, "/_next/static/") || strings.Contains(new_raw.URL.Path, "/static/image") {
 		return nil
 	}
 
@@ -55,16 +54,18 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 		}
 		temp = template.Must(template.ParseFiles(fmt.Sprintf("builder/%s", file)))
 		config.Temp = temp
-
-		nucleiPATH := fmt.Sprintf("%s-fuzzing-%v", file, uuid.New())
-		_, err := os.Stat("template")
+		path := fmt.Sprintf("template/%s/", file)
+		unique := fmt.Sprintf("%s-%s", new_raw.Method, new_raw.URL.Path)
+		hash := sha256.Sum256([]byte(unique))
+		nucleiPATH := fmt.Sprintf("%s-fuzzing-%x", file, hash[:])
+		_, err := os.Stat(path)
 		if os.IsNotExist(err) {
-			errDir := os.MkdirAll("template", 0755)
+			errDir := os.MkdirAll(path, 0755)
 			if errDir != nil {
 				log.Fatal(err)
 			}
 		}
-		file, err := os.Create("template/" + nucleiPATH + ".yaml")
+		file, err := os.Create(path + nucleiPATH + ".yaml")
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(3)
