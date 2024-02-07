@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"gopkg.in/elazarl/goproxy.v1"
+	"github.com/elazarl/goproxy"
 )
 
 func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
@@ -28,13 +28,13 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 		if Contains(config.URI, req.Host) && req.Method != "OPTIONS" && req.Method != "HEAD" {
 			var new_raw http.Request
 
-			is_host := strings.Split(req.Host, ":")
+			// is_host := strings.Split(req.Host, ":")
 			// log.Println(is_host, "is host")
 			new_raw.Method = req.Method
 			new_raw.Proto = req.Proto
 			new_raw.ProtoMajor = req.ProtoMajor
 			new_raw.ProtoMinor = req.ProtoMinor
-			new_raw.Host = is_host[0]
+			new_raw.Host = "{{ Hostname }}" //is_host[0]
 			new_raw.Header = req.Header
 			new_raw.URL = req.URL
 			lenQuery := len(req.URL.Query())

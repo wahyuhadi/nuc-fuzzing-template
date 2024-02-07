@@ -17,13 +17,14 @@ type BodySave struct {
 }
 
 type Config struct {
-	ProxyIP       string
-	Payload       string
-	ProxyPort     string
-	Verbose       bool
-	URI           []string
-	AddQueryParam string
-	Temp          *template.Template
-	TypeAttack    string
-	Templates     string
+	ProxyIP        string
+	Payload        string
+	ProxyPort      string
+	Verbose        bool
+	URI            []string
+	AddQueryParam  string
+	Temp           *template.Template
+	TypeAttack     string
+	Templates      string
+	CacertLocation string
 }

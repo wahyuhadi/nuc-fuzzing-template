@@ -10,7 +10,6 @@ info:
     This is accomplished by the application taking user input and combining it with static parameters to build an SQL query .
   tags: sqli,error,dast
 
-self-contained: true
 requests:
   - raw:
       - |
@@ -22,6 +21,7 @@ requests:
         - "\""
         - "(case when(1=1)+then+1+end);"
         - "`1`````"
+        - "<'>'!@#$%&**())--"
         
     stop-at-first-match: true
     matchers-condition: and

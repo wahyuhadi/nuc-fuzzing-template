@@ -9,7 +9,6 @@ info:
     - https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Inclusion
   tags: lfi,dast,linux
 
-self-contained: true
 requests:
   - raw:
       - |

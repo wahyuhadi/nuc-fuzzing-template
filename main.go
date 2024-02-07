@@ -2,17 +2,20 @@ package main
 
 import (
 	"bufio"
+	"encoding/pem"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 
+	"github.com/elazarl/goproxy"
 	"github.com/wahyuhadi/nuc-fuzzing-template/repeater"
-	"gopkg.in/elazarl/goproxy.v1"
 )
 
 var (
+	cert_location   = flag.String("cert-file", "/tmp/cert.der", "location cert saving ")
 	template_file   = flag.String("tf", "", "Location template file ")
 	type_attack     = flag.String("t", "snipper", "Attack type")
 	proxy_ip        = flag.String("ip", "0.0.0.0", "Set Proxy IP")
@@ -69,12 +72,14 @@ func parse_config() repeater.Config {
 	config.AddQueryParam = *add_query_param
 	// config.Temp = temp
 	config.TypeAttack = *type_attack
+	config.CacertLocation = *cert_location
 
 	return config
 }
 
 func main() {
 	config := parse_config()
+	exportCacert(config)
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.Verbose = *verbose
 	log.Println("Service proxy running on port", *proxy_port)
@@ -90,4 +95,30 @@ func main() {
 		}
 	}()
 	log.Fatal(http.ListenAndServe(*proxy_ip+":"+*proxy_port, proxy))
+}
+
+func exportCacert(config repeater.Config) {
+	filePath := config.CacertLocation
+
+	if filePath != "" {
+		derFile, err := os.Create(filePath)
+		derCert := goproxy.GoproxyCa.Certificate[0]
+		err = pem.Encode(derFile, &pem.Block{
+			Type:  "CERTIFICATE",
+			Bytes: derCert,
+		})
+
+		if err != nil {
+			log.Println("error", fmt.Sprintf("=========================================\n"))
+			log.Println("error", fmt.Sprintf("[Export Cacert] : Error while exporting CA Certificate\n"))
+			log.Println("error", fmt.Sprintf("=========================================\n"))
+			os.Exit(3)
+		}
+
+		derFile.Close()
+
+		log.Println("info", fmt.Sprintf("=========================================\n"))
+		log.Println("info", fmt.Sprintf("[Export Cacert] : %s\n", filePath))
+		log.Println("info", fmt.Sprintf("=========================================\n"))
+	}
 }

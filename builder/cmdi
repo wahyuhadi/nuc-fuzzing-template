@@ -14,7 +14,6 @@ info:
 
 
 
-self-contained: true
 requests:
   - raw:
       - |
