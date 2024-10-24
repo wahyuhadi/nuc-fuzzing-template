@@ -1,0 +1,35 @@
+id: {{.Name}}
+
+info:
+  name: Reflected SSTI Arithmetic Based
+  author: wahyuhadi
+  severity: medium
+  reference:
+    - https://github.com/zaproxy/zap-extensions/blob/2d9898900abe85a47b9fe0ceb85ec39070816b98/addOns/ascanrulesAlpha/src/main/java/org/zaproxy/zap/extension/ascanrulesAlpha/SstiScanRule.java
+    - https://github.com/DiogoMRSilva/websitesVulnerableToSSTI#list-of-seversneeds-update
+  metadata:
+    max-request: 3
+  tags: ssti,dast
+
+
+requests:
+  - raw:
+      - |
+        {{ .Raw }}
+
+    payloads:
+      path:
+        - "'><10000>"    
+
+    stop-at-first-match: true
+    matchers-condition: and
+    matchers:
+      - type: word
+        part: body
+        words:
+          - "'><10000>"
+
+      - type: word
+        part: header
+        words:
+          - "text/html"
