@@ -9,6 +9,8 @@ info:
     or to override valuable ones, or even to execute dangerous system level commands on the database host.
     This is accomplished by the application taking user input and combining it with static parameters to build an SQL query .
   tags: sqli,error,dast
+  metadata:
+    max-request: 3
 
 requests:
   - raw:
