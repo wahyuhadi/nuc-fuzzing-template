@@ -3,7 +3,6 @@ package repeater
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -11,7 +10,7 @@ import (
 
 func create_index_form(config Config, req *http.Request, bodysave bytes.Buffer) []string {
 	var indexed []string
-	log.Println("Creating body json index for fuzzing")
+	fmt.Println("Creating body json index for fuzzing")
 	if config.TypeAttack == "snipper" {
 		indexed = snipper_form(config, req, bodysave)
 	}
@@ -33,10 +32,10 @@ func snipper_form(config Config, req *http.Request, bodysave bytes.Buffer) []str
 		var query_raw string
 		for k, i := range form_body {
 			if k == parv {
-				log.Println("Indexing object param ", k)
+				fmt.Println("Indexing object param ", k)
 				query_raw += fmt.Sprintf("%s=%s&", k, fmt.Sprintf("§%v§", "path"))
 			} else {
-				log.Println("Indexing object param ", k)
+				fmt.Println("Indexing object param ", k)
 				t := &url.URL{Path: i[0]}
 				query_raw += fmt.Sprintf("%s=%s&", k, t.String())
 			}
@@ -51,7 +50,7 @@ func snipper_form(config Config, req *http.Request, bodysave bytes.Buffer) []str
 func create_index_bjson(config Config, req *http.Request, body map[string]interface{}) []map[string]interface{} {
 
 	var indexed = []map[string]interface{}{}
-	log.Println("Creating body json index for fuzzing")
+	fmt.Println("Creating body json index for fuzzing")
 	if config.TypeAttack == "snipper" {
 		indexed = config.snipper_bjson(req, body)
 	}
@@ -69,11 +68,11 @@ func (config Config) snipper_bjson(req *http.Request, body map[string]interface{
 		var new_body = make(map[string]interface{})
 		for k, i := range body {
 			if object == k {
-				log.Println("Indexing object body ", k)
+				fmt.Println("Indexing object body ", k)
 				body := fmt.Sprintf("§%v§", "path")
 				new_body[k] = body
 			} else {
-				log.Println("Indexing objec body ", k)
+				fmt.Println("Indexing objec body ", k)
 				new_body[k] = i
 			}
 		}
@@ -84,7 +83,7 @@ func (config Config) snipper_bjson(req *http.Request, body map[string]interface{
 }
 
 func create_index_query(config Config, req *http.Request) []string {
-	log.Println("Creating query param index for fuzzing")
+	fmt.Println("Creating query param index for fuzzing")
 	var indexed []string
 	if config.TypeAttack == "snipper" {
 		indexed = snipper_query(config, req)
@@ -113,10 +112,10 @@ func snipper_query(config Config, req *http.Request) []string {
 		var query_raw string
 		for k, i := range url_query {
 			if k == parv {
-				log.Println("Indexing object param ", k)
+				fmt.Println("Indexing object param ", k)
 				query_raw += fmt.Sprintf("%s=%s&", k, fmt.Sprintf("§%v§", "path"))
 			} else {
-				log.Println("Indexing object param ", k)
+				fmt.Println("Indexing object param ", k)
 				t := &url.URL{Path: i[0]}
 				query_raw += fmt.Sprintf("%s=%s&", k, t.String())
 			}

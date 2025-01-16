@@ -32,10 +32,10 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 	var templates []string
 	var temp *template.Template
 	// temp := template.Must(template.ParseFiles("sqli"))
-	files, err := os.ReadDir("builder")
+	files, err := os.ReadDir(config.Builder)
 
 	if err != nil {
-		log.Println("Error when read bulder directory")
+		fmt.Println("Error when read builder directory")
 		return nil
 	}
 	for _, file := range files {
@@ -48,8 +48,8 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 	}
 
 	for _, file := range templates {
-		if !is_exist_temp(file) {
-			log.Println("Your template not exist in builder folder : your input is  ", file)
+		if !is_exist_temp(file, config) {
+			fmt.Println("Your template not exist in builder folder : your input is  ", file)
 			continue
 		}
 		temp = template.Must(template.ParseFiles(fmt.Sprintf("builder/%s", file)))
@@ -75,16 +75,16 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 		if err != nil {
 			log.Fatalln(err)
 		}
-		log.Println("Creating template in ", nucleiPATH)
+		fmt.Println("Creating template in ", nucleiPATH)
 	}
 	return nil
 }
 
-func is_exist_temp(t string) bool {
-	files, err := os.ReadDir("builder")
+func is_exist_temp(t string, config Config) bool {
+	files, err := os.ReadDir(config.Builder)
 
 	if err != nil {
-		log.Println("Error when read bulder directory")
+		fmt.Println("Error when read builder directory")
 		return false
 	}
 

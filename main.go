@@ -18,6 +18,7 @@ var (
 	cert_location   = flag.String("cert-file", "/tmp/cert.der", "location cert saving ")
 	template_file   = flag.String("tf", "", "Location template file ")
 	type_attack     = flag.String("t", "snipper", "Attack type")
+	builder         = flag.String("b", "builder", "builder")
 	proxy_ip        = flag.String("ip", "0.0.0.0", "Set Proxy IP")
 	payload         = flag.String("p", "payload/default.txt", "payload location")
 	proxy_port      = flag.String("port", "9191", "Set Proxy Port")
@@ -55,10 +56,10 @@ func parse_config() repeater.Config {
 	if *URIFILE != "" {
 		list, err := readLines(*URIFILE)
 		if err != nil {
-			log.Println(err.Error())
+			fmt.Println(err.Error())
 		}
 
-		log.Println("add URI ", list)
+		fmt.Println("add URI ", list)
 		list_host = list
 	}
 
@@ -71,6 +72,7 @@ func parse_config() repeater.Config {
 	config.URI = list_host
 	config.AddQueryParam = *add_query_param
 	// config.Temp = temp
+	config.Builder = *builder
 	config.TypeAttack = *type_attack
 	config.CacertLocation = *cert_location
 
@@ -82,7 +84,7 @@ func main() {
 	exportCacert(config)
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.Verbose = *verbose
-	log.Println("Service proxy running on port", *proxy_port)
+	fmt.Println("Service proxy running on port", *proxy_port)
 	proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
 	proxy.OnRequest().DoFunc(repeater.Repeater(config))
 	c := make(chan os.Signal)
@@ -109,16 +111,16 @@ func exportCacert(config repeater.Config) {
 		})
 
 		if err != nil {
-			log.Println("error", fmt.Sprintf("=========================================\n"))
-			log.Println("error", fmt.Sprintf("[Export Cacert] : Error while exporting CA Certificate\n"))
-			log.Println("error", fmt.Sprintf("=========================================\n"))
+			println("error", fmt.Sprintf("=========================================\n"))
+			println("error", fmt.Sprintf("[Export Cacert] : Error while exporting CA Certificate\n"))
+			println("error", fmt.Sprintf("=========================================\n"))
 			os.Exit(3)
 		}
 
 		derFile.Close()
 
-		log.Println("info", fmt.Sprintf("=========================================\n"))
-		log.Println("info", fmt.Sprintf("[Export Cacert] : %s\n", filePath))
-		log.Println("info", fmt.Sprintf("=========================================\n"))
+		fmt.Println("info", fmt.Sprintf("=========================================\n"))
+		fmt.Println("info", fmt.Sprintf("[Export Cacert] : %s\n", filePath))
+		fmt.Println("info", fmt.Sprintf("=========================================\n"))
 	}
 }

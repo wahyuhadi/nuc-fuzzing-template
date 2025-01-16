@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -29,7 +28,7 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 			var new_raw http.Request
 
 			// is_host := strings.Split(req.Host, ":")
-			// log.Println(is_host, "is host")
+			// fmt.Println(is_host, "is host")
 			new_raw.Method = req.Method
 			new_raw.Proto = req.Proto
 			new_raw.ProtoMajor = req.ProtoMajor
@@ -49,11 +48,11 @@ func Repeater(config Config) func(req *http.Request, ctx *goproxy.ProxyCtx) (*ht
 
 			uri, _ := url.Parse(req.URL.String())
 			new_raw.URL = uri
-			log.Println(uri)
+			fmt.Println(uri)
 
 			if req.Method == "POST" || req.Method == "PATCH" || req.Method == "PUT" {
 				type_body := check_body_type(bodysave.Body.Bytes(), req)
-				log.Println(type_body)
+				fmt.Println(type_body)
 				if type_body == "json" {
 					// json body
 					config.gen_fuzzing_jbody(new_raw, *req, bodysave.Body)
@@ -84,18 +83,18 @@ func (config Config) gen_fuzzing_form(new_raw, req *http.Request, bodysave bytes
 }
 
 func check_body_type(s []byte, req *http.Request) string {
-	log.Println("Validating request body")
+	fmt.Println("Validating request body")
 	var js map[string]interface{}
 	if json.Unmarshal(s, &js) == nil {
-		log.Println("Body type is json")
+		fmt.Println("Body type is json")
 		return "json"
 	}
 
 	if strings.Contains(req.Header.Get("Content-Type"), "form") {
-		log.Println("Body type is post form ")
+		fmt.Println("Body type is post form ")
 		return "form"
 	}
-	log.Println("undifined body format")
+	fmt.Println("undifined body format")
 	return "undifined"
 }
 
