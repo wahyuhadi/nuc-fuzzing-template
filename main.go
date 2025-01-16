@@ -16,8 +16,10 @@ import (
 
 var (
 	cert_location   = flag.String("cert-file", "/tmp/cert.der", "location cert saving ")
-	template_file   = flag.String("tf", "template", "Location template file ")
+	template_file   = flag.String("tf", "", "Location template file ")
 	type_attack     = flag.String("t", "snipper", "Attack type")
+	template_attack = flag.String("ta", "template", "Location template attack ")
+
 	builder         = flag.String("b", "builder", "builder")
 	proxy_ip        = flag.String("ip", "0.0.0.0", "Set Proxy IP")
 	payload         = flag.String("p", "payload/default.txt", "payload location")
@@ -75,6 +77,7 @@ func parse_config() repeater.Config {
 	config.Builder = *builder
 	config.TypeAttack = *type_attack
 	config.CacertLocation = *cert_location
+	config.TemplateAttack = *template_attack
 
 	return config
 }

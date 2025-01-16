@@ -28,4 +28,5 @@ type Config struct {
 	Templates      string
 	CacertLocation string
 	Builder        string
+	TemplateAttack string
 }

@@ -54,7 +54,7 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 		}
 		temp = template.Must(template.ParseFiles(fmt.Sprintf("%s/%s", config.Builder, file)))
 		config.Temp = temp
-		path := fmt.Sprintf("%s/%s/%s", config.Templates, config.URI[0], file)
+		path := fmt.Sprintf("%s/%s/%s", config.TemplateAttack, config.URI[0], file)
 		unique := fmt.Sprintf("%s-%s", new_raw.Method, new_raw.URL.Path)
 		hash := sha256.Sum256([]byte(unique))
 		nucleiPATH := fmt.Sprintf("%s-fuzzing-%x", file, hash[:])
