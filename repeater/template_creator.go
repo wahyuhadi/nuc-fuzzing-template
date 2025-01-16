@@ -65,7 +65,7 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 				log.Fatal(err)
 			}
 		}
-		file, err := os.Create(path + nucleiPATH + ".yaml")
+		file, err := os.Create(fmt.Sprintf("%s/%s.yaml", path, nucleiPATH))
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(3)
