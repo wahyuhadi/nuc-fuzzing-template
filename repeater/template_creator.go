@@ -52,7 +52,7 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 			fmt.Println("Your template not exist in builder folder : your input is  ", file)
 			continue
 		}
-		temp = template.Must(template.ParseFiles(fmt.Sprintf("builder/%s", file)))
+		temp = template.Must(template.ParseFiles(fmt.Sprintf("%s/%s", config.Builder, file)))
 		config.Temp = temp
 		path := fmt.Sprintf("template/%s/", file)
 		unique := fmt.Sprintf("%s-%s", new_raw.Method, new_raw.URL.Path)
