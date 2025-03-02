@@ -2,12 +2,22 @@ id: {{.Name}}
 
 info:
   name: Local File Inclusion - Linux
-  author: DhiyaneshDK
+  author: Wahyuhadi
   severity: high
   reference:
     - https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Directory%20Traversal/Intruder/directory_traversal.txt
     - https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/File%20Inclusion
   tags: lfi,dast,linux
+  description: |
+    Local File Inclusion (LFI) is a web security vulnerability that allows an attacker to include and execute files from the local server through user-controlled input. This can lead to unauthorized access to sensitive files, information disclosure, or even remote code execution (RCE) under certain conditions.
+  metadata:
+    fixing: 
+      - 1. Use Whitelisting, Allow only specific, predefined files.
+      - 2. Block Directory Traversal,  Sanitize input to prevent ../ or null byte attacks.
+      - 3. Use Least Privilege,  Restrict file permissions and avoid running as root.
+      - 4. Monitor & Log Requests, Track suspicious activity and use a Web Application Firewall (WAF).
+    tech: all
+
 
 requests:
   - raw:

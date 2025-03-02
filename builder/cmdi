@@ -1,18 +1,23 @@
 id: {{.Name}}
 
 info:
-  name: Blind OS Command Injection
-  author: pdteam,geeknik
+  name: OS Command Injection
+  author: Wahyuhadi
   severity: critical
   description: |
-      Potential blind OS command injection vulnerabilities, where the application constructs OS commands using unsanitized user input.
-      Successful exploitation could lead to arbitrary command execution on the system.
+      OS Command Injection is a security vulnerability that occurs when an application improperly passes user-supplied input into system commands. 
+      This allows an attacker to execute arbitrary commands on the host operating system, potentially leading to data breaches, system compromise, or complete server control.
   reference:
     - https://portswigger.net/research/hunting-asynchronous-vulnerabilities
     - https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Command%20Injection/README.md
   tags: cmdi,oast,dast,blind,polyglot
-
-
+  metadata:
+    fixing: 
+      -  1. Avoid Direct System Command Execution, Instead of using system commands, use built-in language functions or libraries that provide safer alternatives.
+      -  2. Input Validation and Whitelisting, Restrict user input to only expected values, ensuring it does not contain harmful characters.
+      -  3. Use Parameterized System Calls, Use functions that do not rely on shell interpretation, like subprocess.run() with an argument list.
+      -  4. Implement the Principle of Least Privilege, Ensure that the application runs with the minimal necessary privileges, limiting the damage if an attack occurs.
+    tech: all
 
 requests:
   - raw:
@@ -21,6 +26,7 @@ requests:
 
     payloads:
       path:
+        - ";cat+/etc/passwd"
         - "|id"
         - ";id"
 
@@ -32,6 +38,7 @@ requests:
         part: body
         regex:
           - 'root:.*:0:0:'
+          - 'uid=0(root)'
       - type: regex
         part: body
         regex:

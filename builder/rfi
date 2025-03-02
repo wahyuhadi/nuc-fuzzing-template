@@ -1,0 +1,35 @@
+id: {{.Name}}
+
+info:
+  name: Remote File Inclusion
+  author: Wahyuhadi
+  severity: high
+  tags: rfi,dast,oast
+  reference:
+    - https://www.invicti.com/learn/remote-file-inclusion-rfi/
+  description: |
+    Remote File Inclusion (RFI) is a critical web security vulnerability that occurs when an application allows user-controlled input to specify a file for inclusion, leading to the execution of malicious remote scripts. This flaw is commonly found in poorly secured web applications that dynamically include files without proper validation or restriction. Attackers exploit RFI vulnerabilities by injecting a URL pointing to a malicious file hosted on an external server, which the vulnerable application then executes.
+
+  metadata:
+    fixing: 
+      - 1. Disable Remote File Inclusion , Set allow_url_include = Off and allow_url_fopen = Off in php.ini.
+      - 2. Use Whitelisting, Only allow predefined files, not user input.
+      - 3. Sanitize User Input, Remove http://, https://, and other external URLs.
+      - 4. Monitor & Log Requests, Track suspicious activity and use a Web Application Firewall (WAF).
+    tech: php
+
+requests:
+  - raw:
+      - |
+        {{ .Raw }}
+
+    payloads:
+      path:
+        - "https://rfi.nessus.org/rfi.txt"
+
+    stop-at-first-match: true
+    matchers:
+      - type: word
+        part: body  # Confirms the PHP was executed
+        words:
+          - "NessusCodeExecTest"

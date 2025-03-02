@@ -9,7 +9,17 @@ info:
     - https://github.com/DiogoMRSilva/websitesVulnerableToSSTI#list-of-seversneeds-update
   metadata:
     max-request: 3
+    tech: all
+    fixing:
+      - 1.Convert special characters (<, >, ", ', &) into harmless HTML entities.
+      - 2.Avoid innerHTML and document.write() in JavaScript.
+      - 3.Use Web Application Firewalls (WAF).
   tags: ssti,dast
+  description: |
+    Cross-Site Scripting (XSS) is a web security vulnerability that allows attackers to inject malicious scripts into web pages viewed by other users. 
+    These scripts are executed in the victim's browser, potentially leading to data theft, session hijacking, or other attacks.
+
+
 
 
 requests:

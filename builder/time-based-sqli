@@ -5,9 +5,16 @@ info:
   author: wahyuhadi
   severity: critical
   description: |
-    This Template detects time-based Blind SQL Injection vulnerability
+    Time-Based SQL Injection is a type of Blind SQL Injection attack where an attacker determines database vulnerabilities by sending queries that force the database to delay its response. 
+    If the response time changes, the attacker can infer whether the injected SQL query was successfully executed, even though there is no direct output from the database.
   metadata:
     max-request: 3
+    tech: sql
+    fixing: 
+      - 1.Prepared statements ensure that user input is treated as data, not executable SQL code. This completely prevents SQL injection.
+      - 2.Stored procedures execute SQL commands safely within the database, reducing the risk of injection when properly implemented.
+      - 3.Never display database error messages to users.
+      - 4.Ensure that the database user only has necessary privileges (e.g., no DROP, ALTER, EXECUTE permissions for web users).
   tags: time-based-sqli,sqli,dast,blind
 
 flow: http(1) && http(2)
@@ -21,10 +28,10 @@ requests:
       path:
         - "(SELECT(0)FROM(SELECT(SLEEP(7)))a)"
         - "'XOR(SELECT(0)FROM(SELECT(SLEEP(7)))a)XOR'Z"
-        - "' AND (SELECT 4800 FROM (SELECT(SLEEP(7)))HoBG)--"
+        - "'+AND+(SELECT+4800+FROM+(SELECT(SLEEP(7)))HoBG)--"
         - "if(now()=sysdate(),SLEEP(7),0)"
         - "'XOR(if(now()=sysdate(),SLEEP(7),0))XOR'Z"
-        - "'XOR(SELECT CASE WHEN(1234=1234) THEN SLEEP(7) ELSE 0 END)XOR'Z"
+        - "'XOR(SELECT+CASE+WHEN(1234=1234)+THEN+SLEEP(7)+ELSE+0+END)XOR'Z"
 
     stop-at-first-match: true
     matchers:

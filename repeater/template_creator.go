@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 	"text/template"
 )
@@ -28,12 +29,14 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 	if new_raw.URL.Path == "/socket.io/" || strings.Contains(new_raw.URL.Path, "/_next/static/") || strings.Contains(new_raw.URL.Path, "/static/image") {
 		return nil
 	}
-
+	ext_url := path.Base(new_raw.URL.Path)
+	if path.Ext(ext_url) == ".js" || path.Ext(ext_url) == ".css" {
+		return nil
+	}
 	var templates []string
 	var temp *template.Template
 	// temp := template.Must(template.ParseFiles("sqli"))
 	files, err := os.ReadDir(config.Builder)
-
 	if err != nil {
 		fmt.Println("Error when read builder directory")
 		return nil
@@ -46,7 +49,6 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 	if config.Templates != "" {
 		templates = strings.Split(config.Templates, ",")
 	}
-
 	for _, file := range templates {
 		if !is_exist_temp(file, config) {
 			fmt.Println("Your template not exist in builder folder : your input is  ", file)
