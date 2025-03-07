@@ -10,6 +10,9 @@ info:
   description: |
     XML External Entity (XXE) is a security vulnerability that allows an attacker to exploit an application that processes XML input by injecting malicious external entity references. This can lead to sensitive data exposure, server-side request forgery (SSRF), denial of service (DoS), or even remote code execution in certain cases.
   metadata:
+    severtity: critical (9)
+    cvss-3.1: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+    cvss-3.1-link: https://www.first.org/cvss/calculator/3.1#CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
     max-request: 3
     tech: all
     fixing:

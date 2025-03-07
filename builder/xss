@@ -8,6 +8,9 @@ info:
     - https://github.com/zaproxy/zap-extensions/blob/2d9898900abe85a47b9fe0ceb85ec39070816b98/addOns/ascanrulesAlpha/src/main/java/org/zaproxy/zap/extension/ascanrulesAlpha/SstiScanRule.java
     - https://github.com/DiogoMRSilva/websitesVulnerableToSSTI#list-of-seversneeds-update
   metadata:
+    severtity: high (7.5)
+    cvss-3.1: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+    cvss-3.1-link: https://www.first.org/cvss/calculator/3.1#CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
     max-request: 3
     tech: all
     fixing:

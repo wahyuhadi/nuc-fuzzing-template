@@ -18,6 +18,10 @@ info:
       -  3. Use Parameterized System Calls, Use functions that do not rely on shell interpretation, like subprocess.run() with an argument list.
       -  4. Implement the Principle of Least Privilege, Ensure that the application runs with the minimal necessary privileges, limiting the damage if an attack occurs.
     tech: all
+    severtity: critical (9)
+    cvss-3.1: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+    cvss-3.1-link: https://www.first.org/cvss/calculator/3.1#CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H
+
 
 requests:
   - raw:
@@ -29,8 +33,6 @@ requests:
         - ";cat+/etc/passwd"
         - "|id"
         - ";id"
-
-    
 
     stop-at-first-match: true
     matchers:
