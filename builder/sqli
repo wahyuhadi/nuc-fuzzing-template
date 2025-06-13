@@ -15,11 +15,12 @@ info:
     cvss-3.1-link: https://www.first.org/cvss/calculator/3.1#CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
     max-request: 3
     tech: sql
-    fixing: 
-      - 1.Prepared statements ensure that user input is treated as data, not executable SQL code. This completely prevents SQL injection.
-      - 2.Stored procedures execute SQL commands safely within the database, reducing the risk of injection when properly implemented.
-      - 3.Never display database error messages to users.
-      - 4.Ensure that the database user only has necessary privileges (e.g., no DROP, ALTER, EXECUTE permissions for web users).
+    
+  fixing: |
+      - Prepared statements ensure that user input is treated as data, not executable SQL code. This completely prevents SQL injection.
+      - Stored procedures execute SQL commands safely within the database, reducing the risk of injection when properly implemented.
+      - Never display database error messages to users.
+      - Ensure that the database user only has necessary privileges (e.g., no DROP, ALTER, EXECUTE permissions for web users).
 
 
 requests:

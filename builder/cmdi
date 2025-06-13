@@ -4,6 +4,11 @@ info:
   name: OS Command Injection
   author: Wahyuhadi
   severity: critical
+  fixing: | 
+      -  Avoid Direct System Command Execution, Instead of using system commands, use built-in language functions or libraries that provide safer alternatives.
+      -  Input Validation and Whitelisting, Restrict user input to only expected values, ensuring it does not contain harmful characters.
+      -  Use Parameterized System Calls, Use functions that do not rely on shell interpretation, like subprocess.run() with an argument list.
+      -  Implement the Principle of Least Privilege, Ensure that the application runs with the minimal necessary privileges, limiting the damage if an attack occurs.
   description: |
       OS Command Injection is a security vulnerability that occurs when an application improperly passes user-supplied input into system commands. 
       This allows an attacker to execute arbitrary commands on the host operating system, potentially leading to data breaches, system compromise, or complete server control.
@@ -12,11 +17,6 @@ info:
     - https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Command%20Injection/README.md
   tags: cmdi,oast,dast,blind,polyglot
   metadata:
-    fixing: 
-      -  1. Avoid Direct System Command Execution, Instead of using system commands, use built-in language functions or libraries that provide safer alternatives.
-      -  2. Input Validation and Whitelisting, Restrict user input to only expected values, ensuring it does not contain harmful characters.
-      -  3. Use Parameterized System Calls, Use functions that do not rely on shell interpretation, like subprocess.run() with an argument list.
-      -  4. Implement the Principle of Least Privilege, Ensure that the application runs with the minimal necessary privileges, limiting the damage if an attack occurs.
     tech: all
     severtity: critical (9)
     cvss-3.1: CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H

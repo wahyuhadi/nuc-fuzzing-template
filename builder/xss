@@ -13,16 +13,15 @@ info:
     cvss-3.1-link: https://www.first.org/cvss/calculator/3.1#CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
     max-request: 3
     tech: all
-    fixing:
-      - 1.Convert special characters (<, >, ", ', &) into harmless HTML entities.
-      - 2.Avoid innerHTML and document.write() in JavaScript.
-      - 3.Use Web Application Firewalls (WAF).
   tags: ssti,dast
   description: |
     Cross-Site Scripting (XSS) is a web security vulnerability that allows attackers to inject malicious scripts into web pages viewed by other users. 
     These scripts are executed in the victim's browser, potentially leading to data theft, session hijacking, or other attacks.
 
-
+  fixing: |
+    - Convert special characters (<, >, ", ', &) into harmless HTML entities.
+    - Avoid innerHTML and document.write() in JavaScript.
+    - Use Web Application Firewalls (WAF).
 
 
 requests:
