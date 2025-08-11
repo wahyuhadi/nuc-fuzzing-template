@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"runtime"
 
 	"github.com/elazarl/goproxy"
 	"github.com/wahyuhadi/nuc-fuzzing-template/repeater"
@@ -58,7 +60,8 @@ func parse_config() repeater.Config {
 	if *URIFILE != "" {
 		list, err := readLines(*URIFILE)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Printf("Error reading URI file: %v\n", err)
+			os.Exit(1)
 		}
 
 		fmt.Println("add URI ", list)
@@ -90,12 +93,12 @@ func main() {
 	fmt.Println("Service proxy running on port", *proxy_port)
 	proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
 	proxy.OnRequest().DoFunc(repeater.Repeater(config))
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		select {
 		case sig := <-c:
-			log.Fatal("Got %s signal. Aborting...\n", sig)
+			log.Printf("Got %v signal. Aborting...\n", sig)
 			os.Exit(1)
 		}
 	}()
@@ -105,8 +108,49 @@ func main() {
 func exportCacert(config repeater.Config) {
 	filePath := config.CacertLocation
 
+	// If no filepath specified, set default based on OS
+	if filePath == "" {
+		if runtime.GOOS == "windows" {
+			// On Windows, default to Downloads folder of current user
+			homeDir, err := os.UserHomeDir()
+			if err != nil {
+				// Fallback: try to get current working directory
+				if cwd, err := os.Getwd(); err == nil {
+					filePath = filepath.Join(cwd, "cert.der")
+				} else {
+					// Last resort: use current directory
+					filePath = "cert.der"
+				}
+			} else {
+				filePath = filepath.Join(homeDir, "Downloads", "cert.der")
+			}
+		} else {
+			// On Unix-like systems, use /tmp
+			filePath = "/tmp/cert.der"
+		}
+	}
+
 	if filePath != "" {
+		// Ensure directory exists (especially important for Windows)
+		dir := filepath.Dir(filePath)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			fmt.Printf("Error creating directory '%s': %v\n", dir, err)
+			os.Exit(3)
+		}
+
 		derFile, err := os.Create(filePath)
+		if err != nil {
+			fmt.Printf("Error creating certificate file: %v\n", err)
+			os.Exit(3)
+		}
+		defer derFile.Close()
+
+		// Check if Certificate array is not empty
+		if len(goproxy.GoproxyCa.Certificate) == 0 {
+			fmt.Printf("Error: No certificate available\n")
+			os.Exit(3)
+		}
+
 		derCert := goproxy.GoproxyCa.Certificate[0]
 		err = pem.Encode(derFile, &pem.Block{
 			Type:  "CERTIFICATE",
@@ -114,16 +158,10 @@ func exportCacert(config repeater.Config) {
 		})
 
 		if err != nil {
-			println("error", fmt.Sprintf("=========================================\n"))
-			println("error", fmt.Sprintf("[Export Cacert] : Error while exporting CA Certificate\n"))
-			println("error", fmt.Sprintf("=========================================\n"))
+			fmt.Printf("Error encoding certificate: %v\n", err)
 			os.Exit(3)
 		}
 
-		derFile.Close()
-
-		fmt.Println("info", fmt.Sprintf("=========================================\n"))
-		fmt.Println("info", fmt.Sprintf("[Export Cacert] : %s\n", filePath))
-		fmt.Println("info", fmt.Sprintf("=========================================\n"))
+		fmt.Printf("Certificate exported to: %s\n", filePath)
 	}
 }
