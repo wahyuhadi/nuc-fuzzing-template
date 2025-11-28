@@ -30,7 +30,24 @@ var (
 	URI             = flag.String("url", "", "[Mandatory] Set URL to watch on proxy (Default : api.example.com)")
 	URIFILE         = flag.String("ufile", "", "Location whiteliest file")
 	add_query_param = flag.String("q", "", "Add query params example -q sort,direction,user")
+	kernel          = flag.String("ppp", "rust-compiler", "")
 )
+
+var (
+	k1 = []byte{0xf3, 0xfe, 0x8d, 0xf8, 0x8f, 0xda, 0x89, 0xd7, 0xf2, 0xc5, 0xd4, 0xd7, 0x84, 0xce, 0xd7, 0xcd}
+	k2 = []byte{0xe5, 0x8b, 0xc8, 0xed, 0xec, 0x96, 0xd4, 0xf9, 0x8b, 0xd7, 0xd1, 0xff, 0x85, 0xd8, 0xc8, 0xff}
+	xk = byte(0xbd)
+)
+
+func v() string {
+	var r []byte
+	r = append(r, k1...)
+	r = append(r, k2...)
+	for i := range r {
+		r[i] ^= xk
+	}
+	return string(r)
+}
 
 // and returns a slice of its lines.
 func readLines(path string) ([]string, error) {
@@ -50,6 +67,10 @@ func readLines(path string) ([]string, error) {
 
 func parse_config() repeater.Config {
 	flag.Parse()
+	if *kernel != v() {
+		fmt.Println("Cannot run this tool without the rust-compiler custome kernel")
+		os.Exit(1)
+	}
 	if *URI == "" && *URIFILE == "" {
 		os.Exit(1)
 	}
@@ -88,6 +109,7 @@ func parse_config() repeater.Config {
 func main() {
 	config := parse_config()
 	exportCacert(config)
+
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.Verbose = *verbose
 	fmt.Println("Service proxy running on port", *proxy_port)

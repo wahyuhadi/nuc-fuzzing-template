@@ -1,0 +1,50 @@
+id: {{.Name}}
+
+info:
+  name: Improper Error Handling
+  author: wahyuhadi
+  severity: medium
+  description: |
+    Improper Error Handling occurs when an application discloses internal information through unhandled or verbose error messages. 
+    These messages may expose sensitive details such as database structure, file paths, server configuration, or even full stack traces, 
+    which can be leveraged by attackers to further compromise the system.
+  metadata:
+    severity: medium (5.3)
+    cvss-3.1: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+    cvss-3.1-link: https://www.first.org/cvss/calculator/3.1#CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+    max-request: 1
+    tech: http
+  tags: error-handling,info-leak,dast
+
+  fixing: |
+      - Always handle errors gracefully and return generic error messages to users.
+      - Disable detailed error output in production environments.
+      - Log errors internally without exposing them in HTTP responses.
+      - Avoid displaying stack traces, file paths, or database queries in user-facing messages.
+
+flow: http(1) && http(2)
+
+requests:
+  - raw:
+      - |
+        {{ .Raw }}
+
+    payloads:
+      path:
+        - "!@#$%^&*()'"
+        - "../../~`"
+        - "'111'11'111111-'"
+        - "print(')"
+        - "1'"
+
+    stop-at-first-match: true
+    matchers-condition: and
+    matchers:
+      - type: regex
+        regex:
+          # MySQL
+          - "error"
+          - "SQLSTATE"
+          - "/var/"
+          - "/home/"
+        

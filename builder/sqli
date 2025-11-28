@@ -60,6 +60,7 @@ requests:
           - "com\\.mysql\\.jdbc"
           - "Zend_Db_(Adapter|Statement)_Mysqli_Exception"
           - "Pdo[./_\\\\]Mysql"
+          - "SQLSTATE\\[\\d+\\]:"
           - "MySqlException"
           - "SQLSTATE\\[\\d+\\]: Syntax error or access violation"
           # MariaDB
