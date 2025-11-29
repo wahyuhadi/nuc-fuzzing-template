@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"text/template"
 )
@@ -54,9 +55,9 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 			fmt.Println("Your template not exist in builder folder : your input is  ", file)
 			continue
 		}
-		temp = template.Must(template.ParseFiles(fmt.Sprintf("%s/%s", config.Builder, file)))
+		temp = template.Must(template.ParseFiles(filepath.Join(config.Builder, file)))
 		config.Temp = temp
-		path := fmt.Sprintf("%s/%s/%s", config.TemplateAttack, config.URI[0], file)
+		path := filepath.Join(config.TemplateAttack, config.URI[0], file)
 		unique := fmt.Sprintf("%s-%s", new_raw.Method, new_raw.URL.Path)
 		hash := sha256.Sum256([]byte(unique))
 		nucleiPATH := fmt.Sprintf("%s-fuzzing-%x", file, hash[:])
@@ -67,12 +68,12 @@ func create_template(new_raw http.Request, newDumpRequest []byte, config Config,
 				log.Fatal(err)
 			}
 		}
-		file, err := os.Create(fmt.Sprintf("%s/%s.yaml", path, nucleiPATH))
+		file, err := os.Create(filepath.Join(path, nucleiPATH+".yaml"))
 		if err != nil {
 			log.Fatal(err)
 			os.Exit(3)
 		}
-		data_temp := Data{TempName: nucleiPATH, Payload: *&config.Payload, Raw: fmt.Sprintf("%s", newDumpRequest), Name: nucleiPATH}
+		data_temp := Data{TempName: nucleiPATH, Payload: config.Payload, Raw: string(newDumpRequest), Name: nucleiPATH}
 		err = config.Temp.Execute(file, data_temp)
 		if err != nil {
 			log.Fatalln(err)
